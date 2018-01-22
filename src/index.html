@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Scrabble, Words With Friends">
+    <meta name="author" content="Eric Totten">
+    <meta name="keyword" content="Scrabble, WWF">
+    <title>Words for Singles</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i" rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="theme-color" content="#ffffff">
+
+    <link href="css/style.min.css" rel="stylesheet">
+</head>
+<body>
+<svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
+    <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
+</svg>
+<div id="gameouter">
+    <div id="gameinner">
+        <div id="gameboard">
+            <table id="scores">
+                <tr>
+                    <td><img src="../img/person.svg" alt="You"></td>
+                    <td id="pscore"></td>
+                    <td id="msgouter">
+                        <div id="msg"></div>
+                    </td>
+                    <td id="oscore"></td>
+                    <td><img src="../img/computer.svg" alt="Computer"></td>
+                </tr>
+            </table>
+
+            <table id="tblOpponent">
+                <tr>
+                    <td id='op0'></td>
+                    <td id='op1'></td>
+                    <td id='op2'></td>
+                    <td id='op3'></td>
+                    <td id='op4'></td>
+                    <td id='op5'></td>
+                    <td id='op6'></td>
+                </tr>
+            </table>
+            <div id="redips-drag">
+                <table id="board" class="table table-bordered" cellspacing="1">
+                    <tbody>
+                    <tr>
+                        <td class="redips-mark">A</td>
+                        <td class="redips-mark">B</td>
+                        <td class="redips-mark">C</td>
+                        <td class="redips-mark">D</td>
+                        <td class="redips-mark">E</td>
+                        <td class="redips-mark">F</td>
+                        <td class="redips-mark">G</td>
+                        <td class="redips-mark">H</td>
+                        <td class="redips-mark">I</td>
+                        <td class="redips-mark">J</td>
+                        <td class="redips-mark">K</td>
+                        <td class="redips-mark">L</td>
+                        <td class="redips-mark">M</td>
+                        <td class="redips-mark">N</td>
+                        <td class="redips-mark">O</td>
+                        <td class="redips-mark"></td>
+                    </tr>
+                    <tr>
+                        <td id="c0_0"></td>
+                        <td id="c1_0"></td>
+                        <td id="c2_0"></td>
+                        <td id="c3_0" class="TW"></td>
+                        <td id="c4_0"></td>
+                        <td id="c5_0"></td>
+                        <td id="c6_0" class="TL"></td>
+                        <td id="c7_0"></td>
+                        <td id="c8_0" class="TL"></td>
+                        <td id="c9_0"></td>
+                        <td id="c10_0"></td>
+                        <td id="c11_0" class="TW"></td>
+                        <td id="c12_0"></td>
+                        <td id="c13_0"></td>
+                        <td id="c14_0"></td>
+                        <td class="redips-mark">1</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_1"></td>
+                        <td id="c1_1"></td>
+                        <td id="c2_1" class="DL"></td>
+                        <td id="c3_1"></td>
+                        <td id="c4_1"></td>
+                        <td id="c5_1" class="DW"></td>
+                        <td id="c6_1"></td>
+                        <td id="c7_1"></td>
+                        <td id="c8_1"></td>
+                        <td id="c9_1" class="DW"></td>
+                        <td id="c10_1"></td>
+                        <td id="c11_1"></td>
+                        <td id="c12_1" class="DL"></td>
+                        <td id="c13_1"></td>
+                        <td id="c14_1"></td>
+                        <td class="redips-mark">2</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_2"></td>
+                        <td id="c1_2" class="DL"></td>
+                        <td id="c2_2"></td>
+                        <td id="c3_2"></td>
+                        <td id="c4_2" class="DL"></td>
+                        <td id="c5_2"></td>
+                        <td id="c6_2"></td>
+                        <td id="c7_2"></td>
+                        <td id="c8_2"></td>
+                        <td id="c9_2"></td>
+                        <td id="c10_2" class="DL"></td>
+                        <td id="c11_2"></td>
+                        <td id="c12_2"></td>
+                        <td id="c13_2" class="DL"></td>
+                        <td id="c14_2"></td>
+                        <td class="redips-mark">3</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_3" class="TW"></td>
+                        <td id="c1_3"></td>
+                        <td id="c2_3"></td>
+                        <td id="c3_3" class="TL"></td>
+                        <td id="c4_3"></td>
+                        <td id="c5_3"></td>
+                        <td id="c6_3"></td>
+                        <td id="c7_3" class="DW"></td>
+                        <td id="c8_3"></td>
+                        <td id="c9_3"></td>
+                        <td id="c10_3"></td>
+                        <td id="c11_3" class="TL"></td>
+                        <td id="c12_3"></td>
+                        <td id="c13_3"></td>
+                        <td id="c14_3" class="TW"></td>
+                        <td class="redips-mark">4</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_4"></td>
+                        <td id="c1_4"></td>
+                        <td id="c2_4" class="DL"></td>
+                        <td id="c3_4"></td>
+                        <td id="c4_4"></td>
+                        <td id="c5_4"></td>
+                        <td id="c6_4" class="DL"></td>
+                        <td id="c7_4"></td>
+                        <td id="c8_4" class="DL"></td>
+                        <td id="c9_4"></td>
+                        <td id="c10_4"></td>
+                        <td id="c11_4"></td>
+                        <td id="c12_4" class="DL"></td>
+                        <td id="c13_4"></td>
+                        <td id="c14_4"></td>
+                        <td class="redips-mark">5</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_5"></td>
+                        <td id="c1_5" class="DW"></td>
+                        <td id="c2_5"></td>
+                        <td id="c3_5"></td>
+                        <td id="c4_5"></td>
+                        <td id="c5_5" class="TL"></td>
+                        <td id="c6_5"></td>
+                        <td id="c7_5"></td>
+                        <td id="c8_5"></td>
+                        <td id="c9_5" class="TL"></td>
+                        <td id="c10_5"></td>
+                        <td id="c11_5"></td>
+                        <td id="c12_5"></td>
+                        <td id="c13_5" class="DW"></td>
+                        <td id="c14_5"></td>
+                        <td class="redips-mark">6</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_6" class="TL"></td>
+                        <td id="c1_6"></td>
+                        <td id="c2_6"></td>
+                        <td id="c3_6"></td>
+                        <td id="c4_6" class="DL"></td>
+                        <td id="c5_6"></td>
+                        <td id="c6_6"></td>
+                        <td id="c7_6"></td>
+                        <td id="c8_6"></td>
+                        <td id="c9_6"></td>
+                        <td id="c10_6" class="DL"></td>
+                        <td id="c11_6"></td>
+                        <td id="c12_6"></td>
+                        <td id="c13_6"></td>
+                        <td id="c14_6" class="TL"></td>
+                        <td class="redips-mark">7</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_7"></td>
+                        <td id="c1_7"></td>
+                        <td id="c2_7"></td>
+                        <td id="c3_7" class="DW"></td>
+                        <td id="c4_7"></td>
+                        <td id="c5_7"></td>
+                        <td id="c6_7"></td>
+                        <td id="c7_7" class="ST"></td>
+                        <td id="c8_7"></td>
+                        <td id="c9_7"></td>
+                        <td id="c10_7"></td>
+                        <td id="c11_7" class="DW"></td>
+                        <td id="c12_7"></td>
+                        <td id="c13_7"></td>
+                        <td id="c14_7"></td>
+                        <td class="redips-mark">8</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_8" class="TL"></td>
+                        <td id="c1_8"></td>
+                        <td id="c2_8"></td>
+                        <td id="c3_8"></td>
+                        <td id="c4_8" class="DL"></td>
+                        <td id="c5_8"></td>
+                        <td id="c6_8"></td>
+                        <td id="c7_8"></td>
+                        <td id="c8_8"></td>
+                        <td id="c9_8"></td>
+                        <td id="c10_8" class="DL"></td>
+                        <td id="c11_8"></td>
+                        <td id="c12_8"></td>
+                        <td id="c13_8"></td>
+                        <td id="c14_8" class="TL"></td>
+                        <td class="redips-mark">9</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_9"></td>
+                        <td id="c1_9" class="DW"></td>
+                        <td id="c2_9"></td>
+                        <td id="c3_9"></td>
+                        <td id="c4_9"></td>
+                        <td id="c5_9" class="TL"></td>
+                        <td id="c6_9"></td>
+                        <td id="c7_9"></td>
+                        <td id="c8_9"></td>
+                        <td id="c9_9" class="TL"></td>
+                        <td id="c10_9"></td>
+                        <td id="c11_9"></td>
+                        <td id="c12_9"></td>
+                        <td id="c13_9" class="DW"></td>
+                        <td id="c14_9"></td>
+                        <td class="redips-mark">10</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_10"></td>
+                        <td id="c1_10"></td>
+                        <td id="c2_10" class="DL"></td>
+                        <td id="c3_10"></td>
+                        <td id="c4_10"></td>
+                        <td id="c5_10"></td>
+                        <td id="c6_10" class="DL"></td>
+                        <td id="c7_10"></td>
+                        <td id="c8_10" class="DL"></td>
+                        <td id="c9_10"></td>
+                        <td id="c10_10"></td>
+                        <td id="c11_10"></td>
+                        <td id="c12_10" class="DL"></td>
+                        <td id="c13_10"></td>
+                        <td id="c14_10"></td>
+                        <td class="redips-mark">11</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_11" class="TW"></td>
+                        <td id="c1_11"></td>
+                        <td id="c2_11"></td>
+                        <td id="c3_11" class="TL"></td>
+                        <td id="c4_11"></td>
+                        <td id="c5_11"></td>
+                        <td id="c6_11"></td>
+                        <td id="c7_11" class="DW"></td>
+                        <td id="c8_11"></td>
+                        <td id="c9_11"></td>
+                        <td id="c10_11"></td>
+                        <td id="c11_11" class="TL"></td>
+                        <td id="c12_11"></td>
+                        <td id="c13_11"></td>
+                        <td id="c14_11" class="TW"></td>
+                        <td class="redips-mark">12</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_12"></td>
+                        <td id="c1_12" class="DL"></td>
+                        <td id="c2_12"></td>
+                        <td id="c3_12"></td>
+                        <td id="c4_12" class="DL"></td>
+                        <td id="c5_12"></td>
+                        <td id="c6_12"></td>
+                        <td id="c7_12"></td>
+                        <td id="c8_12"></td>
+                        <td id="c9_12"></td>
+                        <td id="c10_12" class="DL"></td>
+                        <td id="c11_12"></td>
+                        <td id="c12_12"></td>
+                        <td id="c13_12" class="DL"></td>
+                        <td id="c14_12"></td>
+                        <td class="redips-mark">13</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_13"></td>
+                        <td id="c1_13"></td>
+                        <td id="c2_13" class="DL"></td>
+                        <td id="c3_13"></td>
+                        <td id="c4_13"></td>
+                        <td id="c5_13" class="DW"></td>
+                        <td id="c6_13"></td>
+                        <td id="c7_13"></td>
+                        <td id="c8_13"></td>
+                        <td id="c9_13" class="DW"></td>
+                        <td id="c10_13"></td>
+                        <td id="c11_13"></td>
+                        <td id="c12_13" class="DL"></td>
+                        <td id="c13_13"></td>
+                        <td id="c14_13"></td>
+                        <td class="redips-mark">14</td>
+                    </tr>
+                    <tr>
+                        <td id="c0_14"></td>
+                        <td id="c1_14"></td>
+                        <td id="c2_14"></td>
+                        <td id="c3_14" class="TW"></td>
+                        <td id="c4_14"></td>
+                        <td id="c5_14"></td>
+                        <td id="c6_14" class="TL"></td>
+                        <td id="c7_14"></td>
+                        <td id="c8_14" class="TL"></td>
+                        <td id="c9_14"></td>
+                        <td id="c10_14"></td>
+                        <td id="c11_14" class="TW"></td>
+                        <td id="c12_14"></td>
+                        <td id="c13_14"></td>
+                        <td id="c14_14"></td>
+                        <td class="redips-mark">15</td>
+                    </tr>
+                    </tbody>
+                </table>
+                <div id="tray">
+                    <table id="tblPlayer">
+                        <tr>
+                            <td id='pl0'></td>
+                            <td id='pl1'></td>
+                            <td id='pl2'></td>
+                            <td id='pl3'></td>
+                            <td id='pl4'></td>
+                            <td id='pl5'></td>
+                            <td id='pl6'></td>
+                        </tr>
+                    </table>
+                    <div id="tilesLeft">
+                        <span id="tleft"></span> Tiles Left
+                    </div>
+
+                    <div class="btn-group" role="group" aria-label="Main">
+                        <button id='btnShuffle' title="Shuffle" type="button" class="btn btn btn-warning">
+                            <img width="16" src="../img/shuffle.svg">
+                        </button>
+                        <button id='btnGoBack' title="Go Back One Move" type="button" class="btn btn btn-warning">
+                            <img width="12" src="../img/back.svg"></button>
+                        <button id='btnPass' title="Pass" type="button" class="btn btn btn-warning">
+                            <img width="12" src="../img/forward.svg">
+                        </button>
+                        <button id='btnSwap' title="Swap" type="button" class="btn btn btn-warning">
+                            <img width="12" src="../img/swap.svg">
+                        </button>
+                        <button id='btnPlay' title="Play" type="button" class="btn btn btn-success">
+                            <img width="16" src="../img/play.svg">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="newsidebar">
+            <div class="gametitle mt-1">Words</div>
+            <div class="gametitlefor">- for -</div>
+            <div class="gametitle mb-4">Singles</div>
+            <label for="selGameType">Game Type</label>
+            <select class="form-control" id="selGameType" name="selGameType">
+                <option value="wwf" selected>Words With Friends</option>
+                <option value="scrabble">Scrabble</option>
+            </select>
+            <label class="mt-2" for="selDifficulty">Difficulty Level</label>
+            <select class="form-control" id="selDifficulty" name="selDifficulty">
+                <option value="1">1 (Easy)</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" selected>4 (Keep it Close)</option>
+                <option value="5">5 (Hard)</option>
+            </select>
+            <label for="history" class="mt-2">History</label>
+            <div class="scroller" id="history"></div>
+            <button id='btnSuggest' type="button" class="btn btn-block btn-warning mt-2">Suggest Moves</button>
+            <button id='btnNew' type="button" class="btn btn-block btn-danger">New Game</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" data-backdrop="static" id="lettersModal" tabindex="-1" role="dialog"
+     aria-labelledby="lettersModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="lettersModalLabel">Select a Letter to Replace the Blank</div>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <tr>
+                        <td>
+                            <button type="button" class="btn btn-warning">A</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">B</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">C</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">D</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">E</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">F</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">G</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" class="btn btn-warning">H</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">I</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">J</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">K</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">L</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">M</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">N</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" class="btn btn-warning">O</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">P</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">Q</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">R</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">S</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">T</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">U</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <button type="button" class="btn btn-warning" disabled>&nbsp;</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">V</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">W</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">X</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">Y</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning">Z</button>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-warning" disabled>&nbsp;</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="swapModal" tabindex="-1" role="dialog" aria-labelledby="swapModalTitle" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="swapModalTitle">Select Tiles to Swap</div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <tr>
+                        <td id="swap0"></td>
+                        <td id="swap1"></td>
+                        <td id="swap2"></td>
+                        <td id="swap3"></td>
+                        <td id="swap4"></td>
+                        <td id="swap5"></td>
+                        <td id="swap6"></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap0">
+                                <label for="chkSwap0">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap1">
+                                <label for="chkSwap1">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap2">
+                                <label for="chkSwap2">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap3">
+                                <label for="chkSwap3">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap4">
+                                <label for="chkSwap4">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap5">
+                                <label for="chkSwap5">Swap</label>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="chkswap">
+                                <input type="checkbox" id="chkSwap6">
+                                <label for="chkSwap6">Swap</label>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-sm btn-danger" data-dismiss="modal">Cancel</button>
+                <button id="btnSwapOK" type="button" class="btn btn-sm btn-success">&nbsp;OK&nbsp;</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="suggestModal" tabindex="-1" role="dialog" aria-labelledby="suggestModalTitle"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="suggestModalTitle">Word Suggestions</div>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-striped table-bordered">
+                    <thead class="thead-dark">
+                    <tr>
+                        <th>Word</th>
+                        <th>Points</th>
+                        <th>Position</th>
+                    </tr>
+                    </thead>
+                    <tbody id="bodySuggest">
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="node_modules/jquery/dist/jquery.min.js"></script>
+<script src="vendors/jquery-ui.min.js"></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="node_modules/sweetalert2/dist/sweetalert2.all.min.js"></script>
+<script src="vendors/redips-drag-min.js"></script>
+<!--<script src="js/bits.js"></script>-->
+<script src="js/bonuses.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/ui.js"></script>
+</body>
+</html>
