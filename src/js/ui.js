@@ -269,8 +269,8 @@ $(document).ready(function ($) {
         }).then((result) => {
             if (result.value) {
                 engine.clearLocalStorage();
+                localStorage.setItem("newgame", $gametype.val());
                 location.reload();
-                // loadWords();
             }
         })
     }
@@ -579,7 +579,13 @@ $(document).ready(function ($) {
             updateUI(JSON.parse(localStorage.getItem("board")));
             gameover = (g_myletters === "" || g_completters === "");
         } else {
-            engine = new Engine().init($gametype.val());
+            gt = localStorage.getItem("newgame");
+            if (gt)
+                $gametype.val(gt);
+            else
+                gt = $gametype.val();
+
+            engine = new Engine().init(gt);
             g_pscore = 0;
             g_oscore = 0;
             g_history = "";
@@ -587,6 +593,7 @@ $(document).ready(function ($) {
             g_completters = engine.takeLetters("");
             updateUI(engine.buildBoardHTML());
             updateLocalStorage();
+            localStorage.removeItem("newgame");
             gameover = false;
         }
     }
