@@ -1,15 +1,15 @@
 {
   "name": "Wordgame",
-  "version": "0.95",
+  "version": "1.0",
   "description": "Javascript implementation of Scrabble/WWF",
   "main": "index.html",
   "dependencies": {
     "bootstrap": "4.0.0",
     "jquery": "3.3.1",
-    "sweetalert2": "^7.3.5"
+    "sweetalert2": "^7.7.0"
   },
   "devDependencies": {
-    "browser-sync": "2.23.5",
+    "browser-sync": "2.23.6",
     "del": "3.0.0",
     "gulp": "3.9.1",
     "gulp-autoprefixer": "^4.0.0",

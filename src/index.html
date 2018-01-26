@@ -20,9 +20,6 @@
     <link href="css/style.min.css" rel="stylesheet">
 </head>
 <body>
-<svg class="spinner" width="65px" height="65px" viewBox="0 0 66 66" xmlns="http://www.w3.org/2000/svg">
-    <circle class="path" fill="none" stroke-width="6" stroke-linecap="round" cx="33" cy="33" r="30"></circle>
-</svg>
 <div id="gameouter">
     <div id="gameinner">
         <div id="gameboard">
@@ -31,6 +28,22 @@
                     <td><img src="../img/person.svg" alt="You"></td>
                     <td id="pscore"></td>
                     <td id="msgouter">
+                        <div class="loader la-ball-beat">
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                            <div></div>
+                        </div>
                         <div id="msg"></div>
                     </td>
                     <td id="oscore"></td>
@@ -50,7 +63,7 @@
                 </tr>
             </table>
             <div id="redips-drag">
-                <table id="board" class="table table-bordered" cellspacing="1">
+                <table id="board" class="table table-bordered">
                     <tbody>
                     <tr>
                         <td class="redips-mark">A</td>

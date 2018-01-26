@@ -25,7 +25,7 @@ $(document).ready(function ($) {
         gameover = false,
         initializing = true,
 
-        $spinner = $(".spinner"),
+        $loader = $(".loader"),
         $level = $("#selDifficulty"),
         $msg = $("#msg"),
         $history = $("#history"),
@@ -63,6 +63,7 @@ $(document).ready(function ($) {
                 reverseButtons: true
             }).then((result) => {
                 if (result.value) {
+                    updateUI(JSON.parse(localStorage.getItem("board")));
                     g_history += "<div>You: Passed</div>";
                     g_passes++;
                     if (g_passes >= g_maxpasses) {
@@ -93,7 +94,7 @@ $(document).ready(function ($) {
         btnSuggest = $("#btnSuggest").click(function () {
             if (initializing || gameover)
                 return;
-            $spinner.show();
+            $loader.show();
 
             setTimeout(function () {
 
@@ -124,7 +125,7 @@ $(document).ready(function ($) {
                 engine.moves = null;
                 $bodySuggest.html(body);
                 $suggestModal.modal().draggable();
-                $spinner.hide();
+                $loader.hide();
             }, 50);
         }),
 
@@ -303,7 +304,7 @@ $(document).ready(function ($) {
 
     //---------------------------------------------------------------------------
     function doComputerMove() {
-        $spinner.show();
+        $loader.show();
 
         setTimeout(function () {
             let found_word,
@@ -325,7 +326,7 @@ $(document).ready(function ($) {
             if (engine.moves.length === 0) {
                 g_passes++;
                 if (g_passes >= g_maxpasses) {
-                    $spinner.hide();
+                    $loader.hide();
                     engine.moves = null;
                     announceWinner();
                     return;
@@ -352,7 +353,7 @@ $(document).ready(function ($) {
             g_history += "<div class='ai'>AI: " + words + " (" + found_word.score + " pts)</div>";
             updateLocalStorage();
             updateUI("");
-            $spinner.hide();
+            $loader.hide();
             if (g_completters === "") {
                 announceWinner();
             }
@@ -554,7 +555,7 @@ $(document).ready(function ($) {
     function showWords() {
         let i, j, l, k, words_arr, str = "";
         for (i = 0, j = engine.g_wstr.length; i < j; i++) {
-            words_arr = engine.g_wstr[i].split("_");
+            words_arr = engine.g_wstr[i].split("__");
             for (k = 0, l = words_arr.length; k < l; k++) {
                 if (words_arr[k].length > 0)
                     str += words_arr[k] + "\n";
@@ -602,7 +603,7 @@ $(document).ready(function ($) {
     function loadWords() {
         engine.g_wstr = JSON.parse(localStorage.getItem("g_wstr"));
         if (engine.g_wstr) {
-            $spinner.hide();
+            $loader.hide();
             initializing = false;
             return;
         }
@@ -610,16 +611,68 @@ $(document).ready(function ($) {
         $.get("js/lang/wordlist.json", function (words) {
             localStorage.setItem("g_wstr", JSON.stringify(words));
             engine.g_wstr = words;
-            $spinner.hide();
+            $loader.hide();
             initializing = false;
         });
     }
 
-    $spinner.show();
+    //---------------------------------------------------------------------------
+    function loadTrie() {
+        $.ajax({
+            url: "js/lang/trie.json",
+            dataType: "json",
+            success: function (data) {
+                try {
+                    let trie = new FrozenTrie(data.trie, data.directory, data.nodeCount);
+                    let words = [], allwords = [], i, j;
+
+                    for (i = 97; i < 123; i++) {
+                        words = trie.getPossibilities(String.fromCharCode(i), 50000);
+                        for (j = 0; j < words.length; j++) {
+                            words[j] = words[j].trim();
+                            if (words[j].length < 17)
+                                allwords.push(words[j]);
+                        }
+                    }
+
+                    allwords.sort(function (a, b) {
+                        return a.length - b.length || a.localeCompare(b);
+                    });
+
+                    let wordsArr = [], str = "", lastlen = 0;
+                    for (i = 0, j = allwords.length; i < j; i++) {
+
+                        // str2 += allwords[i]+"__";
+                        if (lastlen !== allwords[i].length) {
+                            if (str)
+                                wordsArr.push("_" + str + "_");
+
+                            str = "";
+                            lastlen = allwords[i].length;
+                        }
+                        str += "_" + allwords[i] + "_";
+                    }
+
+                    // localStorage.setItem("g_wstr", JSON.stringify(wordsArr));
+                    console.log(wordsArr);
+                    $loader.hide();
+                    // initUI(wordsArr);
+                } catch (a) {
+                    console.log('cannot create trie ' + a);
+                }
+            }, error: function (a, b, c) {
+                console.log(b + ' ' + c);
+            }
+        });
+    };
+
+    $loader.show();
     setTimeout(function () {
         initUI();
         loadWords();
         // showWords();
+        // loadTrie();
+        // $loader.show();
     }, 50);
 
 });

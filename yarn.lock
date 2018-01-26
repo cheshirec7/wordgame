@@ -382,9 +382,9 @@ browser-sync-ui@v1.0.1:
     socket.io-client "2.0.4"
     stream-throttle "^0.1.3"
 
-browser-sync@2.23.5:
-  version "2.23.5"
-  resolved "https://registry.yarnpkg.com/browser-sync/-/browser-sync-2.23.5.tgz#088bc5c3bb4dfc1507bad0278f140d8060fe4299"
+browser-sync@2.23.6:
+  version "2.23.6"
+  resolved "https://registry.yarnpkg.com/browser-sync/-/browser-sync-2.23.6.tgz#ed0721c92e5b98c71b7bf839b39092ac9f220650"
   dependencies:
     browser-sync-ui v1.0.1
     bs-recipes "1.3.4"
@@ -3640,9 +3640,9 @@ supports-color@^4.0.0, supports-color@^4.4.0:
   dependencies:
     has-flag "^2.0.0"
 
-sweetalert2@^7.3.5:
-  version "7.3.5"
-  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-7.3.5.tgz#fc900404660aa107dccd0ca4c9c8e918187ec5aa"
+sweetalert2@^7.7.0:
+  version "7.7.0"
+  resolved "https://registry.yarnpkg.com/sweetalert2/-/sweetalert2-7.7.0.tgz#8fcce6ae12108aa0ae6df94adf7bf37272c9934f"
 
 tar-pack@^3.4.0:
   version "3.4.1"

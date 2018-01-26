@@ -39,7 +39,7 @@ function Engine() {
     self.validWord = function (word) {
         if (word.length < 2)
             return false;
-        return self.g_wstr[word.length - 2].indexOf("_" + word + "_") > -1;
+        return self.g_wstr[word.length - 2].indexOf("__" + word + "__") > -1;
     };
 
     //---------------------------------------------------------------------------
@@ -477,15 +477,19 @@ function Engine() {
         }
 
         for (a = self.racksize - 2; a >= 0; a--) {
-            words_arr = self.g_wstr[a].split("_");
+            words_arr = self.g_wstr[a].split("__");
+
             for (i = 0, j = words_arr.length; i < j; i++) {
+                if (words_arr[i].length === 0) {
+                    continue;
+                }
                 local_letter_counts_arr = letter_counts_arr.slice(0);
                 local_jokers = numjokers;
                 word = words_arr[i];
                 word_score = 0;
                 lscrs = [];
                 num_s = 0;
-                ok = word.length > 0;
+                ok = true;
                 for (k = 0, m = word.length; k < m; k++) {
                     idx = word.charCodeAt(k) - self.ASCII_a;
                     if (local_letter_counts_arr[idx] === 0) {
@@ -565,7 +569,6 @@ function Engine() {
             for (ay = 0; ay < self.by; ay++) {
                 if (binfo.board[ax][ay] === "") {
                     regex = self.getRegex("x", ax, ay, binfo.board, rack, numjokers > 0);
-                    // logit(regex);
                     if (regex && regex.max - 1 < self.g_wstr.length) {
                         rx_count++;
                         found_words = found_words.concat(
@@ -576,7 +579,6 @@ function Engine() {
                     }
 
                     regex = self.getRegex("y", ax, ay, binfo.board, rack, numjokers > 0);
-                    // logit(regex);
                     if (regex && regex.max - 1 < self.g_wstr.length) {
                         rx_count++;
                         found_words = found_words.concat(
@@ -910,55 +912,6 @@ function Engine() {
         }
         return sel_word;
     };
-
-    //---------------------------------------------------------------------------
-    // self.loadTrie = function () {
-    //     $.ajax({
-    //         url: "js/lang/dict.json",
-    //         dataType: "json",
-    //         success: function (data) {
-    //             try {
-    //                 let trie = new FrozenTrie(data.trie, data.directory, data.nodeCount);
-    //                 let words = [], allwords = [], i, j;
-    //
-    //                 for (i = 97; i < 123; i++) {
-    //                     words = trie.getPossibilities(String.fromCharCode(i), 50000);
-    //                     for (j = 0; j < words.length; j++) {
-    //                         if (words[j].length < 16)
-    //                             allwords.push(words[j]);
-    //                     }
-    //                 }
-    //
-    //                 allwords.sort(function (a, b) {
-    //                     return a.length - b.length || a.localeCompare(b);
-    //                 });
-    //
-    //                 let wordsArr = [];
-    //                 let str = "", lastlen = 0, str2 = "";
-    //                 for (i = 0, j = allwords.length; i < j; i++) {
-    //
-    //                     // str2 += allwords[i]+"*";
-    //                     if (lastlen !== allwords[i].length) {
-    //                         if (str)
-    //                             wordsArr.push(str + "_");
-    //
-    //                         str = "";
-    //                         lastlen = allwords[i].length;
-    //                     }
-    //                     str += "_" + allwords[i];
-    //                 }
-    //
-    //                 localStorage.setItem("g_wstr", JSON.stringify(wordsArr));
-    //                 // console.log(str2);
-    //                 initUI(wordsArr);
-    //             } catch (a) {
-    //                 console.log('cannot create trie ' + a);
-    //             }
-    //         }, error: function (a, b, c) {
-    //             console.log(b + ' ' + c);
-    //         }
-    //     });
-    // };
 
     //---------------------------------------------------------------------------
     self.localStorageGoBack = function () {
