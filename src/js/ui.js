@@ -94,6 +94,7 @@ $(document).ready(function ($) {
         btnSuggest = $("#btnSuggest").click(function () {
             if (initializing || gameover)
                 return;
+            $msg.html("");
             $loader.show();
 
             setTimeout(function () {
@@ -448,7 +449,10 @@ $(document).ready(function ($) {
 
     //---------------------------------------------------------------------------
     function getBoardPointsPlacementsArrays(lockedOnly = false) {
-        let board_empty = true, x, y, $cell, letter, board = [], boardp = [], placement = [];
+        let board_empty = true, x, y, $cell, letter,
+            board = [], boardp = [], placement = [];
+        // boardr = new Array(engine.by).fill(0),
+        // boardc = new Array(engine.bx).fill(0);
         for (x = 0; x < engine.bx; x++) {
             board[x] = [];
             boardp[x] = [];
@@ -458,23 +462,30 @@ $(document).ready(function ($) {
                 if (letter) {
                     board[x][y] = letter;
                     boardp[x][y] = parseInt($($cell[0]).attr("data-points"));
+                    // boardr[x]++;
+                    // boardc[y]++;
                     board_empty = false;
                 } else if ($cell[0].firstChild && !lockedOnly) {
                     board[x][y] = $($cell[0].firstChild).attr("data-letter");
                     boardp[x][y] = parseInt($($cell[0].firstChild).attr("data-points"));
+                    // boardr[x]++;
+                    // boardc[y]++;
                     placement.push({
-                            ltr: board[x][y],
-                            lsc: boardp[x][y],
-                            x: x, y: y
-                        }
-                    )
+                        ltr: board[x][y],
+                        lsc: boardp[x][y],
+                        x: x, y: y
+                    })
                 } else {
                     board[x][y] = "";
                     boardp[x][y] = 0;
                 }
             }
         }
-        return {board_empty: board_empty, board: board, boardp: boardp, placement: placement};
+        return {
+            board_empty: board_empty, placement: placement,
+            board: board, boardp: boardp
+            // , boardr: boardr, boardc: boardc
+        };
     }
 
     //---------------------------------------------------------------------------
@@ -617,6 +628,56 @@ $(document).ready(function ($) {
     }
 
     //---------------------------------------------------------------------------
+    function createDict(words) {
+        let i, j, arr = [], arr2 = [], lastlen = 0;
+
+        for (i = 0, j = words.length; i < j; i++) {
+            if (lastlen !== words[i].length) {
+                if (arr2.length > 0)
+                    arr.push(arr2);
+                arr2 = [];
+                lastlen = words[i].length;
+            }
+            arr2.push(words[i]);
+        }
+        engine.g_words = arr;
+        logit(engine.g_words);
+    }
+
+    //---------------------------------------------------------------------------
+    function createDict2(words) {
+        let i, j, str = "", lastlen = 0, arr = [];
+
+        for (i = 0, j = words.length; i < j; i++) {
+            if (lastlen !== words[i].length) {
+                if (str.length > 0)
+                    arr.push('_' + str + '_');
+                str = "";
+                lastlen = words[i].length;
+            }
+            str += '_' + (words[i]) + '_';
+        }
+        engine.g_wstr = arr;
+        localStorage.setItem("g_wstr", JSON.stringify(arr));
+    }
+
+    //---------------------------------------------------------------------------
+    function loadWords2() {
+        engine.g_wstr = JSON.parse(localStorage.getItem("g_wstr"));
+        if (engine.g_wstr) {
+            $loader.hide();
+            initializing = false;
+            return;
+        }
+
+        $.get("js/lang/wordlist.txt", function (words) {
+            createDict2(words.split('*'));
+            $loader.hide();
+            initializing = false;
+        });
+    }
+
+    //---------------------------------------------------------------------------
     function loadTrie() {
         $.ajax({
             url: "js/lang/trie.json",
@@ -630,7 +691,7 @@ $(document).ready(function ($) {
                         words = trie.getPossibilities(String.fromCharCode(i), 50000);
                         for (j = 0; j < words.length; j++) {
                             words[j] = words[j].trim();
-                            if (words[j].length < 17)
+                            if (words[j].length < 16)
                                 allwords.push(words[j]);
                         }
                     }
@@ -639,9 +700,10 @@ $(document).ready(function ($) {
                         return a.length - b.length || a.localeCompare(b);
                     });
 
-                    let wordsArr = [], str = "", lastlen = 0;
+                    let wordsArr = [], str = "", lastlen = 0, str2 = "";
                     for (i = 0, j = allwords.length; i < j; i++) {
-
+                        str2 += allwords[i] + '*';
+                        continue;
                         // str2 += allwords[i]+"__";
                         if (lastlen !== allwords[i].length) {
                             if (str)
@@ -654,7 +716,8 @@ $(document).ready(function ($) {
                     }
 
                     // localStorage.setItem("g_wstr", JSON.stringify(wordsArr));
-                    console.log(wordsArr);
+                    // console.log(wordsArr);
+                    console.log(str2);
                     $loader.hide();
                     // initUI(wordsArr);
                 } catch (a) {
@@ -669,10 +732,14 @@ $(document).ready(function ($) {
     $loader.show();
     setTimeout(function () {
         initUI();
-        loadWords();
+        loadWords2();
+
+        // logit(engine.g_words);
+        // engine.getSuggestions(getBoardPointsPlacementsArrays(), g_completters);
+        // $loader.hide();
+
         // showWords();
         // loadTrie();
         // $loader.show();
     }, 50);
-
 });

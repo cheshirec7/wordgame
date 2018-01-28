@@ -33,13 +33,13 @@ function Engine() {
     self.ASCII_z = 122;
     self.letpool = [];
     self.letscore = [];
-    self.g_wstr = null;
+    self.g_wstr = [];
 
     //---------------------------------------------------------------------------
     self.validWord = function (word) {
         if (word.length < 2)
-            return false;
-        return self.g_wstr[word.length - 2].indexOf("__" + word + "__") > -1;
+            return true;
+        return self.g_wstr[word.length - 2].indexOf("_" + word + "_") > -1;
     };
 
     //---------------------------------------------------------------------------
@@ -139,6 +139,67 @@ function Engine() {
     };
 
     //---------------------------------------------------------------------------
+    self.getWordScore = function (binfo, wordinfo) {
+        let xdir = (wordinfo.xy === "x"),
+            max = xdir ? self.bx : self.by,
+            dx = xdir ? 1 : 0,
+            dy = 1 - dx,
+            ps = wordinfo.ps,
+            owords = [], // list of valid orthogonal words created with this move
+            wscore = 0,  // word score
+            oscore = 0,  // orthogonal created words score
+            wordmult = 1,
+            lscr, lseq, bonus, ows, seqc = 0, x, y;
+
+        if (xdir) {
+            x = wordinfo.ps;
+            y = wordinfo.ay;
+        } else {
+            x = wordinfo.ax;
+            y = wordinfo.ps;
+        }
+
+        while (ps < max) {
+            if (binfo.board[x][y] === "" && seqc < wordinfo.seq.length) {
+                lscr = wordinfo.lscrs[seqc];
+                lseq = wordinfo.seq[seqc];
+                ows = self.getOrthWordScore(binfo, lseq, lscr, x, y, dx, dy);
+                if (ows.score === -1) {
+                    return -1;
+                }
+
+                if (ows.score > 0)
+                    owords.push(ows.word);
+
+                bonus = self.boardmults[x][y];
+                wordmult *= self.wmults[bonus];
+                lscr *= self.lmults[bonus];
+                if (self.lmults[bonus] > 1)
+                    wordinfo.lmults++;
+                wscore += lscr;
+                oscore += ows.score;
+                seqc++;
+            } else if (binfo.board[x][y] === "" && seqc === wordinfo.seq.length) {
+                break;
+            } else {
+                wscore += binfo.boardp[x][y];
+            }
+            x += dx;
+            y += dy;
+            ps++;
+        }
+
+        wordinfo.wordmult = wordmult;
+        wordinfo.owords = owords;
+        wscore *= wordmult;
+
+        if (wordinfo.seq.length === self.racksize)
+            wscore += self.allLettersBonus;
+
+        return wscore + oscore;
+    };
+
+    //---------------------------------------------------------------------------
     self.doPlacementScoring = function (binfo, isplacement, dx, dy, minx, maxx, miny, maxy, worderrs) {
         let i, x, y, xy,
             numl = (dx === 1) ? maxx - minx + 1 : maxy - miny + 1,
@@ -177,9 +238,7 @@ function Engine() {
                     if (worderrs !== "")
                         worderrs += ", ";
                     worderrs += orthinfo.word.toUpperCase();
-                }
-
-                if (orthinfo.score > 0) {
+                } else if (orthinfo.score > 0) {
                     oscore += orthinfo.score;
                     words.push(orthinfo.word);
                 }
@@ -325,84 +384,21 @@ function Engine() {
     };
 
     //---------------------------------------------------------------------------
-    self.getWordScore = function (binfo, wordinfo) {
-        let xdir = (wordinfo.xy === "x"),
-            max = xdir ? self.bx : self.by,
-            dx = xdir ? 1 : 0,
-            dy = 1 - dx,
-            ps = wordinfo.ps,
-            owords = [], // list of valid orthogonal words created with this move
-            wscore = 0,  // word score
-            oscore = 0,  // orthogonal created words score
-            wordmult = 1,
-            lscr, lseq, bonus, ows, seqc = 0, x, y;
-
-        if (xdir) {
-            x = wordinfo.ps;
-            y = wordinfo.ay;
-        } else {
-            x = wordinfo.ax;
-            y = wordinfo.ps;
-        }
-
-        while (ps < max) {
-            if (binfo.board[x][y] === "" && seqc < wordinfo.seq.length) {
-                lscr = wordinfo.lscrs[seqc];
-                lseq = wordinfo.seq[seqc];
-                ows = self.getOrthWordScore(binfo, lseq, lscr, x, y, dx, dy);
-                if (ows.score === -1) {
-                    return -1;
-                }
-
-                if (ows.score > 0)
-                    owords.push(ows.word);
-
-                bonus = self.boardmults[x][y];
-                wordmult *= self.wmults[bonus];
-                lscr *= self.lmults[bonus];
-                if (self.lmults[bonus] > 1)
-                    wordinfo.lmults++;
-                wscore += lscr;
-                oscore += ows.score;
-                seqc++;
-            } else if (binfo.board[x][y] === "" && seqc === wordinfo.seq.length) {
-                break;
-            } else {
-                wscore += binfo.boardp[x][y];
-            }
-            x += dx;
-            y += dy;
-            ps++;
-        }
-
-        wordinfo.wordmult = wordmult;
-        wordinfo.owords = owords;
-        wscore *= wordmult;
-
-        if (wordinfo.seq.length === self.racksize)
-            wscore += self.allLettersBonus;
-
-        return wscore + oscore;
-    };
-
-    //---------------------------------------------------------------------------
     self.getOrthWordScore = function (binfo, lseq, lscr, x, y, dx, dy) {
         let wordmult = 1,
             score = 0,
-            wx = x,
-            wy = y,
-            xmax = self.bx,
-            ymax = self.by,
-            lsave = binfo.board[wx][wy],
-            ssave = binfo.boardp[wx][wy],
-            bonus = self.boardmults[wx][wy],
+            xsave = x,
+            ysave = y,
+            lsave = binfo.board[x][y],
+            ssave = binfo.boardp[x][y],
+            bonus = self.boardmults[x][y],
             orthword = "";
 
         wordmult *= self.wmults[bonus];
         lscr *= self.lmults[bonus];
 
-        binfo.board[wx][wy] = lseq;
-        binfo.boardp[wx][wy] = lscr;
+        binfo.board[x][y] = lseq;
+        binfo.boardp[x][y] = lscr;
 
         while (x >= 0 && y >= 0 && binfo.board[x][y] !== "") {
             x -= dy;
@@ -414,7 +410,7 @@ function Engine() {
             y += dx;
         }
 
-        while (x < xmax && y < ymax && binfo.board[x][y] !== "") {
+        while (x < self.bx && y < self.by && binfo.board[x][y] !== "") {
             orthword += binfo.board[x][y];
             score += binfo.boardp[x][y];
             x += dy;
@@ -423,8 +419,8 @@ function Engine() {
 
         // Orthogonal word built - we can now go back to the previous
         // value on the board in the position of the orthogonal anchor
-        binfo.board[wx][wy] = lsave;
-        binfo.boardp[wx][wy] = ssave;
+        binfo.board[xsave][ysave] = lsave;
+        binfo.boardp[xsave][ysave] = ssave;
 
         if (orthword.length === 1) { // the letter does not form an orthogonal word.
             return {score: 0, word: orthword};
@@ -433,8 +429,8 @@ function Engine() {
         if (!self.validWord(orthword)) {
             return {score: -1, word: orthword};
         }
-        score *= wordmult;
 
+        score *= wordmult;
         return {score: score, word: orthword};
     };
 
@@ -542,12 +538,11 @@ function Engine() {
                     });
                 }
             }
-
-            res_arr.sort(function (a, b) {
-                return b.score - a.score || a.word.localeCompare(b.word)
-            }).slice(0, 46);
         }
-        self.moves = res_arr.slice(0, 23);
+
+        self.moves = res_arr.sort(function (a, b) {
+            return b.score - a.score || a.word.localeCompare(b.word)
+        }).slice(0, 23);
     };
 
     //---------------------------------------------------------------------------
@@ -569,45 +564,46 @@ function Engine() {
             for (ay = 0; ay < self.by; ay++) {
                 if (binfo.board[ax][ay] === "") {
                     regex = self.getRegex("x", ax, ay, binfo.board, rack, numjokers > 0);
-                    if (regex && regex.max - 1 < self.g_wstr.length) {
+                    // if (regex)
+                    // logit(regex);
+                    if (regex) {
                         rx_count++;
                         found_words = found_words.concat(
-                            self.getAllWordsForRegex(binfo, regex, rletmap, numjokers, ax, ay, matches_cache))
-                            .sort(function (a, b) {
-                                return b.score - a.score;
-                            });//.slice(0, numWordsToGet);
+                            self.getAllWordsForRegex(binfo, regex, rletmap, numjokers, ax, ay, matches_cache));
                     }
 
                     regex = self.getRegex("y", ax, ay, binfo.board, rack, numjokers > 0);
-                    if (regex && regex.max - 1 < self.g_wstr.length) {
+                    // if (regex)
+                    // logit(regex);
+                    if (regex) {
                         rx_count++;
                         found_words = found_words.concat(
-                            self.getAllWordsForRegex(binfo, regex, rletmap, numjokers, ax, ay, matches_cache))
-                            .sort(function (a, b) {
-                                return b.score - a.score;
-                            });//.slice(0, numWordsToGet);
+                            self.getAllWordsForRegex(binfo, regex, rletmap, numjokers, ax, ay, matches_cache));
                     }
-                    regex = null;
                 }
             }
         }
 
-        matches_cache = null;
-        self.rx_count = rx_count;
-        self.word_count = found_words.length;
-        self.moves = found_words.slice(0, numWordsToGet);
+        // self.rx_count = rx_count;
+        // self.word_count = found_words.length;
         // logit(self.word_count);
         // logit(self.moves);
+        matches_cache = null;
+        self.moves = found_words.sort(function (a, b) {
+            return b.score - a.score;
+        }).slice(0, numWordsToGet);
     };
 
     //---------------------------------------------------------------------------
     self.getAllWordsForRegex = function (binfo, regex, rletmap, numjokers, ax, ay, matches_cache) {
-        let i, j, k, match, matches, req_seq, word, wlc, id, mseq,
+        let i, j, k, match, matches, req_seq, word, wlc, id,
             wordinfo, wordinfos = [], seq_lscrs = [], num_s = 0, idx = 0,
             letmap, ok, jokers, regexp = new RegExp(regex.rgx, "g");
 
+        // TODO check regex min and max
         for (wlc = regex.min - 2; wlc < regex.max - 1; wlc++) {
             id = regex.rgx + wlc;
+
             if (id in matches_cache)
                 matches = matches_cache[id];
             else {
@@ -618,8 +614,7 @@ function Engine() {
                         if (match[i])
                             req_seq += match[i];
                     }
-                    mseq = match[0];
-                    word = mseq.substr(1, mseq.length - 2);
+                    word = match[0].substr(1, match[0].length - 2);
                     matches.push({word: word, reqs: req_seq});
                 }
                 matches_cache[id] = matches;
@@ -676,9 +671,17 @@ function Engine() {
     };
 
     //---------------------------------------------------------------------------
+    self.getUnique = function (str) {
+        return String.prototype.concat(...new Set(str))
+    };
+
+    //---------------------------------------------------------------------------
     self.getRegex = function (dir, ax, ay, board, rack, has_joker) {
-        let i, numlets = rack.length,
-            letrange = has_joker ? self.letrange : "[" + rack + "]",
+        // deX........  => /de[a-z]{1,7}/g
+        // ..eX.m.....  => /e[a-z]{2}m[a-z]{0,3}/g
+        // ...X.m..p..  => /e[a-z]m[a-z]{2}p[a-z]{0,2}/g
+        // r = new RegExp("de[a-z]{1,7}", "g")
+        let i,
             xdir = (dir === "x"),
             ap = xdir ? ax : ay,
             max = xdir ? self.bx : self.by,
@@ -686,25 +689,34 @@ function Engine() {
             dy = 1 - dx,
             l_x = ax - dx, // board position to left of x
             a_y = ay - dy, // board position above y
-            ok = (ap > 0 && board[l_x][a_y] !== ""),
+            b_y, r_x,
             sc = ap,  // sc: short for scan
             scx = ax + dx,
             scy = ay + dy,
-            b_y, r_x,
+            letrange = has_joker ? self.letrange : "[" + self.getUnique(rack) + "]",
+
+            // by default, set the minimum location of the first
+            // letter found in the parallel line search to be
+            // higher than any possible minimum found when building
+            // the regex, so that if no minimum is found in the
+            // parallel scan, the minimum from the regex creation
+            // will be used.
             sminpos = max,
-            empty;
+            empty,
+            found = (ap > 0 && board[l_x][a_y] !== "");
 
-        if (!ok)
+        if (!found)
             empty = 0;
-
+        // No board letters to the left or above anchor, check
+        // if lines parallel to direction have letters in them.
         while (sc < max - 1) {
             if (board[scx][scy] !== "") {
-                ok = true;
+                found = true;
                 break;
             } else
                 empty++;
 
-            if (empty > numlets)
+            if (empty > rack.length)
                 break;
 
             a_y = scy - dx;  // x line above y
@@ -713,8 +725,9 @@ function Engine() {
             r_x = scx + dy;  // y line right of x
             if (l_x >= 0 && a_y >= 0 && board[l_x][a_y] !== "" ||
                 r_x < max && b_y < max && board[r_x][b_y] !== "") {
+                // found a board letter to the left or above the scanned line.
                 sminpos = sc + 1;
-                ok = true;
+                found = true;
                 break;
             }
 
@@ -723,13 +736,16 @@ function Engine() {
             sc++;
         }
 
-        if (!ok)
-            return null;
+        if (!found) {
+            return null; // No letters that we can connect to from ax,ay
+        }
 
         let ps = ap - 1,
             xs = ax - dx,
-            ys = ay - dy;
+            ys = ay - dy,
+            prev = "";
 
+        // Find any letters immediately preceding the first placement location
         while (ps >= 0 && board[xs][ys] !== "") {
             xs -= dx;
             ys -= dy;
@@ -744,66 +760,82 @@ function Engine() {
                 ys = 0;
         }
 
-        let prev = "";
         for (i = ps; i < ap; i++) {
             prev += board[xs][ys];
             xs += dx;
             ys += dy;
         }
 
-        let x = ax, // x anchor coordinate
-            y = ay, // y anchor coordinate
-            p = ap, // either ax or ay, depending on the context
-            mws = "_", // "^"; // marker for word start
-            mwe = "_", // "$"; // marker for word end
-            regex = mws + prev, // regexp match
+        // prev now contains the sequence of letters that immediately precede
+        // the anchor position (either above it or to it's left, depending on
+        // the direction context).
+        // Generate the regular expression for the possible words
+        // starting at ax,ay using direction dir. Also calculate minimum
+        // word size, maximum word size and word starting position.
+        let x = ax,
+            y = ay,
+            p = ap,
+            regex = "_" + prev,
             regex2 = "", // another possible match
             letters = 0,
             blanks = 0,
             minl = 0, // minimum word length that can be created
             minplay = 1, // no letters were played yet
-            countpost, // flag to include letters in line for minl count
-            prevlen = prev.length,
+            countpost = false, // flag to include letters in line for minl count
             flpos = ap,
-            l,
-            hadletters = false;
+            mindiff = 0,
+            s,
+            maxl;
 
+        // iterate over word letters
         while (p < max) {
-            l = board[x][y];
-            if (l === "") {
-                if (p === ap && prevlen > 0) {
-                    minl = prevlen + 1;
-                    countpost = true;
-                } else
-                    countpost = false;
+            if (board[x][y] === "") {
+                if (p === ap && prev.length > 0) {
+                    minl = prev.length + 1;
+                    countpost = true; // start adding additional board letters to minimum word length
+                } else {
+                    countpost = false; // stop adding additional board letters to minimum word length
+                }
 
                 blanks++;
-                if (letters === numlets)
+                if (letters === rack.length)
                     break;
                 letters++;
             } else {
-                hadletters = true;
                 if (blanks > 0) {
                     regex += "(" + letrange;
                     if (blanks > 1) {
+                        // If there are letters before the anchor position
+                        // and two or more free spaces, we can add another
+                        // match for a shorter word without connecting
+                        // to additional letters in same line on board.
+                        // For example, the following:
+                        // ..ad..sing (two blanks after d)
+                        // Should make it possible to find ..adD.sing
+                        // and also ..adVIsing, so the search should match
+                        // _ad([a-z]{1})_  or _ad([a-z]{2})sing_
                         if (prev !== "") {
                             regex2 = "|" + regex;
                             if (blanks > 2)
                                 regex2 += "{1," + (blanks - 1) + "}";
-                            regex2 += ")" + mwe;
+                            regex2 += ")_";
                         }
                         regex += "{" + blanks + "}";
                     }
-                    regex += ")"; // close group capture
+                    regex += ")";
                     if (minl === 0) {
-                        minl = prevlen + blanks;
+                        minl = prev.length + blanks;
+                        // start adding additional board
+                        // letters to minimum word length
                         countpost = true;
                     }
-                    if (countpost && flpos === ap)
+                    if (countpost && flpos === ap) {
+                        // save 1st letter position
                         flpos = p;
+                    }
                     blanks = 0;
                 }
-                regex += l;
+                regex += board[x][y];
                 if (countpost)
                     minl++;
                 minplay = 0; // letters were played
@@ -814,19 +846,22 @@ function Engine() {
         }
 
         if (blanks > 0) {
+            // Last place was a blank
             regex += "(" + letrange;
             if (p === max)
+            // and it was the end of the board
                 regex += "{" + minplay + "," + blanks + "}";
             else {
+                // used all the letters before reaching the end of the board
+                // check the next board space
                 if (board[x][y] === "")
                     regex += "{" + minplay + "," + blanks + "}";
                 else {
                     regex += "{" + blanks + "}";
                     for (i = p + 1; i < max; i++) {
-                        l = board[x][y];
-                        if (l === "")
+                        if (board[x][y] === "")
                             break;
-                        regex += l;
+                        regex += board[x][y];
                         x += dx;
                         y += dy;
                     }
@@ -835,23 +870,32 @@ function Engine() {
             regex += ")";
         }
 
+        // flpos - position of first letter that was found when generating the regex
         if (flpos === ap)
+        // no first letter was found in the regex scan.
+        // Are there any letters before the anchor?
             if (prev !== "")
-                minl = prevlen + 1;
+            //  yes - then the minimum is one more
+                minl = prev.length + 1;
             else
+            // No, then set the minimum word length to
+            // be the distance to the first letter found
+            // in the parallel line scan.
                 minl = sminpos - ap + 1;
         else {
-            let mindiff = flpos - sminpos;
+            mindiff = flpos - sminpos;
             if (mindiff > 1)
+            // If the regex scan first letter position is at a
+            // distance of two or more further from the parallel
+            // scan first letter position, then the minimum word
+            // length is the distance from the anchor to the first
+            // letter found in the parallel scan.
                 minl -= mindiff;
         }
 
-        let s = ap - prev.length,
-            maxl = p - s;
-
-        regex += mwe + regex2;
-
-        // TODO: optimize by eliminating length 4 in this case
+        s = ap - prev.length;
+        maxl = p - s;
+        regex += "_" + regex2;
 
         return {
             rgx: regex,
@@ -860,7 +904,7 @@ function Engine() {
             max: maxl,
             prec: prev,
             xy: dir
-        };
+        }
     };
 
     //---------------------------------------------------------------------------
