@@ -727,7 +727,7 @@ $(document).ready(function ($) {
                 console.log(b + ' ' + c);
             }
         });
-    };
+    }
 
     $loader.show();
     setTimeout(function () {

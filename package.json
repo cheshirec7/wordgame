@@ -4,26 +4,27 @@
   "description": "Javascript implementation of Scrabble/WWF",
   "main": "index.html",
   "dependencies": {
-    "bootstrap": "4.0.0",
+    "popper.js": "1.14.3",
+    "bootstrap": "4.1.1",
     "jquery": "3.3.1",
-    "sweetalert2": "^7.7.0"
+    "sweetalert2": "^7.20.10"
   },
   "devDependencies": {
-    "browser-sync": "2.23.6",
+    "browser-sync": "2.24.4",
     "del": "3.0.0",
     "gulp": "3.9.1",
-    "gulp-autoprefixer": "^4.0.0",
+    "gulp-autoprefixer": "^5.0.0",
     "gulp-bower-src": "0.1.0",
     "gulp-concat": "2.6.1",
     "gulp-contains": "1.1.0",
     "gulp-cssmin": "0.2.0",
     "gulp-filter": "5.1.0",
-    "gulp-rename": "1.2.2",
-    "gulp-replace": "0.6.1",
-    "gulp-sass": "3.1.0",
+    "gulp-rename": "1.2.3",
+    "gulp-replace": "1.0.0",
+    "gulp-sass": "4.0.1",
     "gulp-search": "1.0.0",
     "gulp-uglify": "3.0.0",
-    "require-dir": "0.3.2",
+    "require-dir": "1.0.0",
     "run-sequence": "2.2.1"
   },
   "scripts": {
